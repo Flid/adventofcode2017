@@ -12,6 +12,7 @@ module worker (
     dff current_min[32] (#INIT(hffff));
     dff current_max[32];
   }
+  sig tmp[32];
   
   
   always {
@@ -27,7 +28,8 @@ module worker (
     }
     
     if(new_line) {
-      current_sum.d = current_sum.q + (current_max.q - current_min.q);
+      tmp = current_max.q - current_min.q;
+      current_sum.d = current_sum.q + tmp;
       current_min.d = hffff;
       current_max.d = h0000;
     }

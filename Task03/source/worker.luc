@@ -1,0 +1,84 @@
+// What we are doing here:
+// Calculate n, as min(n) where n**2 >= X
+// side_len = n*2 - 1
+// side_offset = (side_len ** 2 - X) % (side_len - 1)
+// center_element = side_len / 2
+// return n + abs(side_offset - center_element) - 1
+
+
+module worker (
+    input clk,  // clock
+    input rst,  // reset
+    input new_value[32],
+    input new_input,
+    output out[32],
+    output out_ready
+  ) {
+  
+  .clk(clk), .rst(rst) {
+    dff n[32];
+    dff target_number[32];
+    dff solution_found;
+    dff solution[32];
+    fsm state(#INIT(WAIT)) = {WAIT, CALCULATE_N, CALC_SIDE_OFFSET, FINAL_CALC, SAVE};
+  }
+  sig side_len[32];
+  sig center_element[32];
+  
+  
+  always {
+    out_ready = solution_found.q;
+    out = solution.q;
+    side_len = n.q + n.q - 1;
+    
+    if(state.q == state.WAIT && new_input) {
+      state.d = state.CALCULATE_N;
+      target_number.d = new_value;
+      solution_found.d = 0;
+      n.d = 1;
+    }
+    
+    if(state.q == state.CALCULATE_N)
+    {
+      
+      if((n.q+n.q - 1) * (n.q+n.q - 1) < target_number.q) {
+        n.d = n.q + 1;
+      }
+      else {
+        // Initial approach to get (max_val - target_number.q) % (max_val - 1)
+        // without modulus operator.
+        solution.d = side_len * side_len - target_number.q;
+        state.d = state.CALC_SIDE_OFFSET;
+      }
+    }
+    
+    if(state.q == state.CALC_SIDE_OFFSET) {
+      
+      if(solution.q > side_len - 1) {
+        solution.d = solution.q - (side_len - 1);
+      }
+      else {
+        state.d = state.FINAL_CALC;
+      }
+    }
+    
+    if(state.q == state.FINAL_CALC) {
+      // solution now is side_offset, which is `(max_val - target_numberx) % (side_len - 1)`
+      center_element = side_len >> 1;
+      
+      if(solution.q >= center_element) {
+        solution.d = n.q + (solution.q - center_element) - 1;
+      }
+      else {
+        solution.d = n.q + (center_element - solution.q) - 1;
+      }
+      state.d = state.SAVE;
+    }
+    
+    if(state.q == state.SAVE) {
+      // We need this additional clock cycle to update the data.
+      solution_found.d = 1;
+      state.d = state.WAIT;
+    }
+  }
+}
