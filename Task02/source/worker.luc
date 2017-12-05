@@ -1,0 +1,35 @@
+module worker (
+    input clk,  // clock
+    input rst,  // reset
+    input new_value[32],
+    input new_input,
+    output out[32],
+    input new_line
+  ) {
+  
+  .clk(clk), .rst(rst) {
+    dff current_sum[32];
+    dff current_min[32] (#INIT(hffff));
+    dff current_max[32];
+  }
+  
+  
+  always {
+    out = current_sum.q;
+    
+    if(new_input) {
+      if(new_value > current_max.q) {
+        current_max.d = new_value;
+      }
+      if(new_value < current_min.q) {
+        current_min.d = new_value;
+      }
+    }
+    
+    if(new_line) {
+      current_sum.d = current_sum.q + (current_max.q - current_min.q);
+      current_min.d = hffff;
+      current_max.d = h0000;
+    }
+  }
+}
