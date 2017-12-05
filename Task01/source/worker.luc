@@ -1,0 +1,44 @@
+module worker (
+    input clk,  // clock
+    input rst,  // reset
+    input new_byte[8],
+    input new_input,
+    output out[16],
+    input final_calc
+  ) {
+  
+  .clk(clk), .rst(rst) {
+    dff current_sum[16];
+    dff last_byte[8];
+    dff first_byte[8];
+    dff is_first(#INIT(1));
+  }
+  
+  
+  always {
+    out = current_sum.q;
+    
+    if(new_input) {
+      
+      last_byte.d = new_byte;
+      
+      if(is_first.q) {
+        is_first.d = 0;
+        first_byte.d = new_byte;
+      }
+      else {
+        if(new_byte == last_byte.q) {
+          current_sum.d = current_sum.q + new_byte;
+        }
+      }
+    }
+    
+    
+    
+    if(final_calc) {
+      if(last_byte.q == first_byte.q) {
+        current_sum.d = current_sum.q + first_byte.q;
+      }
+    }
+  }
+}
