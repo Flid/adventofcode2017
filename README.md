@@ -1,6 +1,16 @@
 ## Advent Of Code 2017 solutiuons
 
-That's my approach to solve the [tasks](https://adventofcode.com/2017). It's not funny to use usual programming languages, so I decided to learn something new. I'll try to use FPGA where possible.
+That's my approach to solve the [tasks](https://adventofcode.com/2017). It's not funny to use usual programming languages, so I decided to learn something new. I'll try to learn at least 5 languages, including something extream like FPGA development.
+
+## Languages used:
+
+1. Lucid/Verilog (1)
+2. Lucid/Verilog
+3. Lucid/Verilog
+4. Ruby
+5. C
+
+(1) Lucid is an extension for Verilog, Hardware Description Language, I've uploaded it to a real FPGA, the data being sent using a Python script.
 
 ## Requirements
 
