@@ -12,6 +12,7 @@ That's my approach to solve the [tasks](https://adventofcode.com/2017). It's not
 6. C++11
 7. Scala
 8. Erlang
+9. Java
 
 (1) Lucid is an extension for Verilog, Hardware Description Language, I've uploaded it to a real FPGA, the data being sent using a Python script.
 
