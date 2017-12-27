@@ -1,16 +1,6 @@
 ﻿using System;
-/*
-The solution is quite inefficient, but is sort of nice :)
-Basically we define a class to store a double-linked list 
-with O(1)-cost flipping - changing a direction.
 
-So for every step of the algorythm we cut a piece of the dequeu, 
-flip, merge with the original queue. This operation is still linear.
-
-I've got an idea how to do it much faster, I'll implement it better later, and with another language :)
-*/
-
-namespace test
+namespace knot
 {
 	class Node
 	{
@@ -41,8 +31,8 @@ namespace test
 			set_prev(start, end);
 			this.head = start;
 		}
-			
-		Node get_next(Node node) {
+
+		public Node get_next(Node node) {
 			return node.refs[this.next_direction];
 		}
 
@@ -135,41 +125,82 @@ namespace test
 	}
 	class MainClass
 	{
-		public static void Main (string[] args)
-		{
-			// Put your data here
-			uint queue_size = 5;
-			uint[] input = new uint[] {3, 4, 1, 5};
+		public const uint QUEUE_SIZE = 256;
 
+		static byte[] get_length_seq(string input) {
+			byte[] end_bytes = { 17, 31, 73, 47, 23 };
+			byte[] input_bytes = new byte[input.Length + end_bytes.Length];
+
+			for (int i = 0; i < input.Length; i++) {
+				input_bytes [i] = Convert.ToByte(input [i]);
+			}
+			for (int i = 0; i < end_bytes.Length; i++) {
+				input_bytes [input.Length + i] = end_bytes [i];
+			}
+			return input_bytes;
+		}
+
+		static FlipCircleQueue apply_operations(byte[] input_bytes) {
 			FlipCircleQueue fcq = new FlipCircleQueue();
-			for (int i = 0; i < queue_size; i++) {
+			for (int i = 0; i < QUEUE_SIZE; i++) {
 				fcq.add_node (i);
 			}
-
 			uint skip_size = 0;
 
 			// Once we move the queue head back and force, we need to keep 
 			// track of the original start position for the final calculation.
 			long start_pos = 0;
 
-			foreach(uint l in input) {
-				if (l > 0) {
-					FlipCircleQueue cut = fcq.cut (fcq.head, l);
-					cut.flip ();
-					cut.reset_head (cut.n_from_head (1));
-					fcq.merge (cut);
-				}
+			for (int iteration = 0; iteration < 64; iteration++) {
+				foreach (uint l in input_bytes) {
+					if (l > 0) {
+						FlipCircleQueue cut = fcq.cut (fcq.head, l);
+						cut.flip ();
+						cut.reset_head (cut.n_from_head (1));
+						fcq.merge (cut);
+					}
 
-				fcq.reset_head (fcq.n_from_head (skip_size));
-				start_pos = (queue_size + start_pos - l - skip_size) % queue_size;
-				skip_size++;
+					fcq.reset_head (fcq.n_from_head (skip_size));
+					start_pos = (QUEUE_SIZE + start_pos - l - skip_size) % QUEUE_SIZE;
+					skip_size++;
+				}
 			}
 
+			// Calculate the hash
+			start_pos = (start_pos + QUEUE_SIZE) % QUEUE_SIZE;
 
-			Console.Write ("Solution: ");
-			Node target1 = fcq.n_from_head ((uint)start_pos);
-			Node target2 = fcq.n_from_node (target1, 1);
-			Console.WriteLine (target1.value * target2.value);
+			fcq.reset_head (fcq.n_from_head ((uint)start_pos));
+			return fcq;
+		}
+
+		static string extract_hash(FlipCircleQueue fcq) {
+			
+			Node node = fcq.head;
+
+			byte[] sums = new byte[QUEUE_SIZE / 16];
+
+			for (int i = 0; i < QUEUE_SIZE; i++) {
+				sums [i / 16] = (byte)(sums [i / 16] ^ (byte)node.value);
+
+				node = fcq.get_next (node);
+			}
+			return BitConverter.ToString(sums).Replace("-", "").ToLower();
+		}
+
+		static string calculate_hash(string input) {
+			byte[] input_bytes = get_length_seq (input);
+
+			// Initialize the queue
+			FlipCircleQueue fcq = apply_operations(input_bytes);
+			return extract_hash (fcq);
+		}
+		
+		public static void Main (string[] args)
+		{
+			// Put your data here
+			string input = "1,2,3";
+			Console.Write ("\nSolution: ");
+			Console.WriteLine (calculate_hash(input));
 		}
 	}
 }
