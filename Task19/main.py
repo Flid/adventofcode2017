@@ -14,6 +14,7 @@ def main():
     direction = [0, 1]
     
     found_letters = []
+    steps_made = 0
     
     while True:
         x += direction[0]
@@ -21,6 +22,8 @@ def main():
         
         if x == -1:
             break
+        
+        steps_made += 1
         
         cell = lines[y][x]
         
@@ -40,6 +43,7 @@ def main():
                     direction = [0, 1]
             
     print(''.join(found_letters))
+    print(steps_made, 'steps made')
         
     
 if __name__ == '__main__':
