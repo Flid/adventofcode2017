@@ -21,6 +21,7 @@ That's my approach to solve the [tasks](https://adventofcode.com/2017). It's not
 15. Dart
 16. Go
 17. Cython
+18. Python
 
 (1) Lucid is an extension for Verilog, Hardware Description Language, I've uploaded it to a real FPGA, the data being sent using a Python script.
 

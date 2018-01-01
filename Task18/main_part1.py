@@ -16,7 +16,6 @@ class Program:
                 continue
             
             items = cmd.split()
-            #import pdb; pdb.set_trace()
             
             if items[0] in _one_param_ops:
                 op, param = items
@@ -77,12 +76,12 @@ class CPU:
 def main():
     program = Program()
     
-    with open('data.txt') as fd:
+    with open('data_part1.txt') as fd:
         program.load_commands(fd.read().split('\n'))
 
     cpu = CPU()
     freq = cpu.execute(program)
-    print("Part 1 solution:", freq)
+    print('Part 1 solution:', freq)
     
 if __name__ == '__main__':
     main()
