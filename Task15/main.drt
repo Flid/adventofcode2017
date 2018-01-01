@@ -1,0 +1,29 @@
+
+Iterable<num> naturalsTo(int init, int factor, int mod) sync* {
+  int k = init;
+  while (true) {
+    k = (k * factor) % mod;
+    yield k;
+  }
+}
+
+// This is where the app starts executing.
+main() {
+    var gen1 = naturalsTo(65, 16807, 2147483647);
+    var gen2 = naturalsTo(8921, 48271, 2147483647);
+    var iter1 = gen1.iterator;
+    var iter2 = gen2.iterator;
+    
+    int matches = 0;
+    
+    for(num i=0; i<40000000; i++) {
+        iter1.moveNext();
+        iter2.moveNext();
+        
+        if (iter1.current % 65536 == iter2.current % 65536) {
+            matches++;
+        }
+    }
+   
+   print(matches);
+} 
