@@ -1,22 +1,32 @@
 
-Iterable<num> naturalsTo(int init, int factor, int mod) sync* {
+Iterable<num> naturalsTo(int init, int factor, int mod, int check_div) sync* {
   int k = init;
   while (true) {
     k = (k * factor) % mod;
-    yield k;
+    
+    if (k % check_div == 0) {
+        yield k;
+    }
   }
 }
 
 // This is where the app starts executing.
 main() {
-    var gen1 = naturalsTo(65, 16807, 2147483647);
-    var gen2 = naturalsTo(8921, 48271, 2147483647);
+    int iterations = 40000000;
+    var gen1 = naturalsTo(65, 16807, 2147483647, 1);
+    var gen2 = naturalsTo(8921, 48271, 2147483647, 1);
+    
+    // For part 2:
+    // int iterations = 5000000;
+    // var gen1 = naturalsTo(65, 16807, 2147483647, 4);
+    // var gen2 = naturalsTo(8921, 48271, 2147483647, 8);
+    
     var iter1 = gen1.iterator;
     var iter2 = gen2.iterator;
     
     int matches = 0;
     
-    for(num i=0; i<40000000; i++) {
+    for(num i=0; i<iterations; i++) {
         iter1.moveNext();
         iter2.moveNext();
         
@@ -27,3 +37,4 @@ main() {
    
    print(matches);
 } 
+ 
